@@ -1,0 +1,9 @@
+{
+	"name": "CDCAirBnB",
+	"location": "northeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "5ffcf603-86fb-41ab-a619-7a065d818e5b",
+		"tenantId": "4ffe8d1c-2e0f-42e3-ab07-6641825df9f5"
+	}
+}
