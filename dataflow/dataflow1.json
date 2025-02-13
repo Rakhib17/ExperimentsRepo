@@ -1,0 +1,103 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "CosmosDbNoSqlContainer1",
+						"type": "DatasetReference"
+					},
+					"name": "BookingData"
+				},
+				{
+					"dataset": {
+						"referenceName": "Booking_Fact",
+						"type": "DatasetReference"
+					},
+					"name": "DatapresentinSynapse1"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "BadRecords"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "currentdata1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          booking_id as string,",
+				"          property_id as string,",
+				"          customer_id as integer,",
+				"          owner_id as string,",
+				"          check_in as string,",
+				"          check_out as string,",
+				"          booking_date as date,",
+				"          currency as string,",
+				"          amount as double,",
+				"          property_location as (city as string, country as string),",
+				"          time_stamp as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     enableChangeFeed: true,",
+				"     changeFeedStartFromTheBeginning: true,",
+				"     format: 'document') ~> BookingData",
+				"source(output(",
+				"          booking_id as string,",
+				"          property_id as string,",
+				"          customer_id as integer,",
+				"          owner_id as string,",
+				"          check_in_date as date,",
+				"          check_out_date as date,",
+				"          booking_date as timestamp,",
+				"          amount as double,",
+				"          currency as string,",
+				"          city as string,",
+				"          country as string,",
+				"          full_address as string,",
+				"          stay_duration as long,",
+				"          booking_year as integer,",
+				"          booking_month as integer,",
+				"          timestamp as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table',",
+				"     staged: true) ~> DatapresentinSynapse1",
+				"BookingData split(check_in>check_out,",
+				"     disjoint: false) ~> BadRecords@(BadRecords, GoodRecords)",
+				"BadRecords@GoodRecords derive(booking_id = booking_id,",
+				"          property_id = property_id,",
+				"          customer_id = customer_id,",
+				"          owner_id = owner_id,",
+				"          check_in = check_in,",
+				"          check_out = check_out,",
+				"          booking_date = booking_date,",
+				"          currency = currency,",
+				"          amount = amount,",
+				"          city = property_location.city,",
+				"          country = property_location.country,",
+				"          time_stamp = time_stamp,",
+				"          full_address = concat(property_location.city, ', ', property_location.country)\r",
+				",",
+				"          stay_duration = (toTimestamp(check_out) - toTimestamp(check_in)) /86400000,",
+				"          booking_year = year(booking_date),",
+				"          booking_month = month(booking_date)) ~> derivedColumn1",
+				"derivedColumn1, DatapresentinSynapse1 lookup(derivedColumn1@booking_id == DatapresentinSynapse1@booking_id,",
+				"     multiple: false,",
+				"     pickup: 'first',",
+				"     desc(timestamp, true),",
+				"     broadcast: 'auto')~> currentdata1"
+			]
+		}
+	}
+}

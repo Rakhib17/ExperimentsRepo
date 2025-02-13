@@ -1,0 +1,60 @@
+{
+	"name": "CosmosDbNoSqlContainer1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "CosmosDbNoSql1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "CosmosDbSqlApiCollection",
+		"schema": {
+			"type": "object",
+			"properties": {
+				"booking_id": {
+					"type": "string"
+				},
+				"property_id": {
+					"type": "string"
+				},
+				"customer_id": {
+					"type": "integer"
+				},
+				"owner_id": {
+					"type": "string"
+				},
+				"check_in": {
+					"type": "string"
+				},
+				"check_out": {
+					"type": "string"
+				},
+				"booking_date": {
+					"type": "string"
+				},
+				"currency": {
+					"type": "string"
+				},
+				"amount": {
+					"type": "number"
+				},
+				"property_location": {
+					"type": "object",
+					"properties": {
+						"city": {
+							"type": "string"
+						},
+						"country": {
+							"type": "string"
+						}
+					}
+				},
+				"time_stamp": {
+					"type": "string"
+				}
+			}
+		},
+		"typeProperties": {
+			"collectionName": "Bookings"
+		}
+	}
+}
